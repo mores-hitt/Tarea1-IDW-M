@@ -65,4 +65,25 @@ public class AccountRepository : IAccountRepository
     {
         return 0 < await _dataContext.SaveChangesAsync();
     }
+
+    public async Task<AccountPasswordDto?> GetLoginCredentialsAsync(string email)
+    {
+        User? user = await _dataContext
+            .Users.Where(student => student.Email == email)
+            .FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            return null;
+        }
+
+        AccountPasswordDto dto =
+            new()
+            {
+                EncryptedPassword = user.PasswordHash,
+                PasswordSalt = user.PasswordSalt
+            };
+
+        return dto;
+    }
 }
